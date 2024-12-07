@@ -1,68 +1,58 @@
 package plugin.artofluxis.project.util
 
-import kotlinx.serialization.Serializable
 import net.minecraft.core.BlockPos
 import net.minecraft.network.protocol.game.ClientboundBlockDestructionPacket
-import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.block.state.BlockState
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.block.Block
-import org.bukkit.craftbukkit.v1_20_R3.CraftWorld
-import org.bukkit.craftbukkit.v1_20_R3.block.CraftBlock
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer
+import org.bukkit.craftbukkit.block.CraftBlock
+import org.bukkit.craftbukkit.entity.CraftPlayer
 import org.bukkit.entity.Player
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random
 
-// Расширение для получения BlockPos из Location
+// Extension to get BlockPos from Location
 val Location.blockPos: BlockPos
     get() = BlockPos(x.toInt(), y.toInt(), z.toInt())
 
-// Расширение для получения NMS-игрока из Bukkit-игрока
+// Extension to get the NMS player from a Bukkit player
 val Player.nms: ServerPlayer
     get() = (this as CraftPlayer).handle
 
-// Расширение для получения NMS-состояния блока из Bukkit-блока
+// Extension to get the NMS block state from a Bukkit block
 val Block.nms: BlockState
     get() = (this as CraftBlock).nms
 
-// Расширение для получения NMS-мира из Bukkit-мира
-val World.nms: ServerLevel
-    get() = (this as CraftWorld).handle
-
 /**
- * Функция для отображения анимации разрушения блока в определённой позиции.
- * @param source - игрок, который инициировал разрушение.
- * @param progress - прогресс разрушения (от 1 до 10).
- * @param showToEveryone - если true, то показывать анимацию всем игрокам в мире.
+ * Function to display block breaking animation at a specific position.
+ * @param source - the player who initiated the block breaking.
+ * @param progress - the progress of the destruction (from 1 to 10).
+ * @param showToEveryone - if true, shows the animation to all players in the world.
  */
 fun Location.setBlockDestruction(source: Player, progress: Int, showToEveryone: Boolean = false) {
-    val dec = progress - 1 // Прогресс отображается от 0 до 9, поэтому уменьшаем значение на 1
-    val pos = blockPos // Получаем позицию блока
-    val hash = pos.hashCode() // Генерируем уникальный хеш для этой позиции
+    val dec = progress - 1 // Progress is displayed from 0 to 9, so decrement the value by 1
+    val pos = blockPos // Get block position
+    val hash = pos.hashCode() // Generate a unique hash for this position
 
-    // Определяем, каким игрокам показывать разрушение
+    // Determine which players to show the destruction animation to
     val players = if (showToEveryone) world.players else listOf(source)
 
-    // Для каждого игрока отправляем пакет для отображения разрушения блока
+    // Send a packet to each player to display the block destruction animation
     players.forEach { player ->
+        player.uniqueId
         player.nms.connection.send(
             ClientboundBlockDestructionPacket(
-                hash, // Используем хеш для идентификации разрушения
-                pos,  // Позиция блока
-                dec   // Прогресс разрушения
+                hash, // Use the hash to identify the destruction
+                pos,  // Block position
+                dec   // Progress of the destruction
             )
         )
     }
 }
-
-
-// Serializable класс для сохранения данных игрока
-@Serializable
-class PlayerSave
 
 class Region(
     val corner1: Location,
@@ -72,7 +62,7 @@ class Region(
     private val world: World = corner1.world
 
     init {
-        if (world.name != corner2.world.name) throw IllegalArgumentException("Был создан регион из 2 местоположений в разных мирах.")
+        if (world.name != corner2.world.name) throw IllegalArgumentException("A region was created from two locations in different worlds.")
     }
 
     private val first = Location(
@@ -88,7 +78,7 @@ class Region(
         max(corner1.z, corner2.z)
     )
 
-    // Итерация по всем блокам в регионе с выполнением переданного действия
+    // Iterate over all blocks in the region and perform the given action
     fun iterate(action: (x: Int, y: Int, z: Int) -> Unit) {
         for (x in first.x.toInt()..second.x.toInt()) {
             for (y in first.y.toInt()..second.y.toInt()) {
@@ -99,7 +89,7 @@ class Region(
         }
     }
 
-    // Итерация по всем блокам с индексами смещения относительно первой точки
+    // Iterate over all blocks with offset indices relative to the first point
     fun iterateWithIndexes(action: (x: Int, y: Int, z: Int, xIndex: Int, yIndex: Int, zIndex: Int) -> Unit) {
         val firstX = first.x.toInt()
         val firstY = first.y.toInt()
@@ -117,9 +107,9 @@ class Region(
     }
 
     /**
-     * Копирование всех блоков из текущего региона в новое местоположение с учетом центра исходного региона и центра вставки.
-     * @param sourceCenter - центр региона источника, откуда копируются блоки.
-     * @param pasteCenter - центр вставки, куда добавляются блоки.
+     * Copy all blocks from the current region to a new location, considering the source region center and the paste center.
+     * @param sourceCenter - center of the source region from where blocks are copied.
+     * @param pasteCenter - center of the paste region where blocks are added.
      */
     fun copyTo(sourceCenter: Location, pasteCenter: Location) {
 
@@ -129,12 +119,12 @@ class Region(
         val sourceWorld = sourceCenter.world
         val pasteWorld = pasteCenter.world
 
-        // Определите смещение для вставки на основе углов региона
+        // Determine the offset for pasting based on region corners
         val xOffset = pasteCenter.blockX - sourceCenter.blockX
         val yOffset = pasteCenter.blockY - sourceCenter.blockY
         val zOffset = pasteCenter.blockZ - sourceCenter.blockZ
 
-        // Итерация по регионам и копирование блоков
+        // Iterate over the regions and copy blocks
         iterate { x, y, z ->
             val sourceBlock = sourceWorld.getBlockAt(x, y, z)
             val pasteBlock = pasteWorld.getBlockAt(
@@ -145,12 +135,20 @@ class Region(
             pasteBlock.blockData = sourceBlock.blockData
         }
     }
+    fun randomLocation(): Location {
+        return Location(
+            world,
+            Random.nextDouble(corner1.x, corner2.x),
+            Random.nextDouble(corner1.y, corner2.y),
+            Random.nextDouble(corner1.z, corner2.z)
+        )
+    }
 }
 
 /**
- * Преобразует строку в объект Region.
- * @param region - строка, содержащая информацию о мире, игнорировании Y, и координатах углов региона.
- * @return Region - регион, созданный на основе строки.
+ * Converts a string into a Region object.
+ * @param region - string containing information about the world, Y-ignore flag, and corner coordinates of the region.
+ * @return Region - a region created based on the string.
  */
 fun toRegion(region: String): Region {
     val corners = region.split(" | ")
