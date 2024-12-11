@@ -4,8 +4,8 @@ plugins {
     id("io.papermc.paperweight.userdev") version "1.7.5"
 }
 
-group = "me.beshenii"
-version = "1.0"
+group = "plugin.artofluxis"
+version = "0.0"
 
 repositories {
     mavenCentral()
@@ -28,14 +28,10 @@ tasks.jar {
 
     doFirst {
         from(configurations.runtimeClasspath.get().filter {
-            it.path.contains("beshenii")
+            it.path.contains("artofluxis")
         }.map { if (it.isDirectory) it else zipTree(it) })
     }
 
 
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-tasks.assemble {
-    dependsOn("reobfJar")
 }

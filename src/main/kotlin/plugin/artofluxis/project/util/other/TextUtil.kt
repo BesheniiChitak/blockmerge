@@ -14,12 +14,14 @@ operator fun Component.times(other: Component): Component = this.append(other).c
 operator fun Component.minus(other: Component): Component = this.append(other).color(other.color())
 
 @OptIn(ExperimentalStdlibApi::class)
-enum class Color(val rgb: Int) {
+enum class MColor(val rgb: Int) {
 
     RED(0xff6e6e),
     LIME(0xa6ff6e),
     GRAY(0xabc4d6),
-    GOLD(0xffb657);
+    GOLD(0xffb657),
+    WHITE(0xffffff),
+    PURPLE(0xb770e0);
 
     companion object {
         val format = HexFormat { number.prefix = "&#"; number.removeLeadingZeros = true }
@@ -32,8 +34,8 @@ enum class Color(val rgb: Int) {
 
 fun Component.color(color: Int) = this.color(TextColor.color(color))
 fun String.color(color: Int) = plain(this).color(color)
-fun Component.color(color: Color) = this.color(color.rgb)
-fun String.color(color: Color) = this.color(color.rgb)
+fun Component.color(color: MColor) = this.color(color.rgb)
+fun String.color(color: MColor) = this.color(color.rgb)
 
 fun plain(text: Component): Component = text.decoration(TextDecoration.ITALIC, false)
 fun plain(string: String): Component = plain(text(string))

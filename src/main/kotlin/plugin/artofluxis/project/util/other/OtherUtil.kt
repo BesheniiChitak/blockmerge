@@ -1,42 +1,192 @@
 package plugin.artofluxis.project.util.other
 
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
-import org.bukkit.Bukkit
-import plugin.artofluxis.project.plugin
-import java.io.InputStreamReader
-import java.lang.reflect.Type
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.descriptors.PrimitiveKind.LONG
+import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonDecoder
+import kotlinx.serialization.json.JsonEncoder
+import kotlinx.serialization.json.JsonUnquotedLiteral
+import kotlinx.serialization.json.jsonPrimitive
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.Component.text
+import net.kyori.adventure.text.Component.translatable
+import org.bukkit.Material
+import org.bukkit.entity.Player
+import plugin.artofluxis.project.util.item
 
-val localized = setOf("ru", "en")
-val localization = hashMapOf<String, HashMap<String, String>>()
+typealias BigInteger = @Serializable(with = BigIntegerSerializer::class) java.math.BigInteger
 
-fun loadConfig() {}
+@OptIn(ExperimentalSerializationApi::class)
+private object BigIntegerSerializer : KSerializer<BigInteger> {
 
-fun loadLocalization() {
-    val gson = Gson()
+    override val descriptor = PrimitiveSerialDescriptor("java.math.BigInteger", LONG)
 
-    for (lang in localized) {
-        val file = plugin.getResource("localization/$lang.json")?.reader()
+    override fun deserialize(decoder: Decoder): BigInteger =
+        when (decoder) {
+            is JsonDecoder -> decoder.decodeJsonElement().jsonPrimitive.content.toBigInteger()
+            else -> decoder.decodeString().toBigInteger()
+        }
 
-        if (file != null) {
-            try {
-                // Define the type of the map
-                val type: Type = object : TypeToken<HashMap<String, String>>() {}.type
+    override fun serialize(encoder: Encoder, value: BigInteger) =
+        when (encoder) {
+            is JsonEncoder -> encoder.encodeJsonElement(JsonUnquotedLiteral(value.toString()))
+            else -> encoder.encodeString(value.toString())
+        }
+}
 
-                // Parse the JSON file into a map
-                val langMap: HashMap<String, String> = gson.fromJson(file, type)
+val magnitudeKeys = listOf(
+    "num.thousands",
+    "num.millions",
+    "num.billions",
+    "num.trillions",
+    "num.quadrillions",
+    "num.quintillions",
+    "num.sextillions",
+    "num.septillions",
+    "num.octillions",
+    "num.nonillions",
+    "num.decillions",
+    "num.undecillions",
+    "num.duodecillions",
+    "num.tredecilions",
+    "num.quattuordecillions",
+    "num.quindecillions",
+    "num.sexdecillions",
+    "num.septendecillions",
+    "num.octodecillions",
+    "num.novemdecillions",
+    "num.vigintillions",
+    "num.unvigintillions",
+    "num.duovigintillions",
+    "num.tresvigintillions",
+    "num.quattuorvigintillions",
+    "num.quinvigintillions",
+    "num.sexvigintillions",
+    "num.septenvigintillions",
+    "num.octovigintillions",
+    "num.novemvigintillions",
+    "num.trigintillions",
+    "num.untrigintillions",
+    "num.duotrigintillions",
+    "num.trestrigintillions",
+    "num.quattuortrigintillions",
+    "num.quintrigintillions",
+    "num.sextrigintillions",
+    "num.septentrigintillions",
+    "num.octotrigintillions",
+    "num.novemtrigintillions",
+    "num.quadragintillions",
+    "num.unquadragintillions",
+    "num.duoquadragintillions",
+    "num.trequadragintillions",
+    "num.quattuorquadragintillions",
+    "num.quinquadragintillions",
+    "num.sexquadragintillions",
+    "num.septenquadragintillions",
+    "num.octoquadragintillions",
+    "num.novemquadragintillions",
+    "num.quinquagintillions",
+    "num.unquinquagintillions",
+    "num.duoquinquagintillions",
+    "num.trequinquagintillions",
+    "num.quattuorquinquagintillions",
+    "num.quinquinquagintillions",
+    "num.sexquinquagintillions",
+    "num.septenquinquagintillions",
+    "num.octoquinquagintillions",
+    "num.novemquinquagintillions",
+    "num.sexagintillions",
+    "num.unsexagintillions",
+    "num.duosexagintillions",
+    "num.treseхagintillions",
+    "num.quattuorsexagintillions",
+    "num.quinsexagintillions",
+    "num.sexsexagintillions",
+    "num.septensexagintillions",
+    "num.octosexagintillions",
+    "num.novemsexagintillions",
+    "num.septuagintillions",
+    "num.unseptuagintillions",
+    "num.duoseptuagintillions",
+    "num.treseptuagintillions",
+    "num.quattuorseptuagintillions",
+    "num.quinseptuagintillions",
+    "num.sexseptuagintillions",
+    "num.septenseptuagintillions",
+    "num.octoseptuagintillions",
+    "num.novemseptuagintillions",
+    "num.octogintillions",
+    "num.unoctogintillions",
+    "num.duooctogintillions",
+    "num.treoctogintillions",
+    "num.quattuoroctogintillions",
+    "num.quinoctogintillions",
+    "num.sexoctogintillions",
+    "num.septenoctogintillions",
+    "num.octooctogintillions",
+    "num.novemoctogintillions",
+    "num.nonagintillions",
+    "num.unnonagintillions",
+    "num.duononagintillions",
+    "num.trenonagintillions",
+    "num.quattuornonagintillions",
+    "num.quinnonagintillions",
+    "num.sexnonagintillions",
+    "num.septennonagintillions",
+    "num.octononagintillions",
+    "num.novemnonagintillions",
+    "num.centillions"
+)
 
-                // Add the parsed map to the localization map for the current language
-                localization[lang] = langMap
+@Serializable
+enum class Notation {
+    NORMAL, SCIENTIFIC
+}
 
-            } catch (e: Exception) {
-                Bukkit.getConsoleSender().sendMessage("Error loading localization for language $lang: ${e.message}")
-            }
-        } else {
-            Bukkit.getConsoleSender().sendMessage("Localization file for language $lang not found")
+fun BigInteger.formatted(notation: Notation): Component {
+    if (this < BigInteger.valueOf(10_000)) {
+        text(this.toString())
+    }
+    val magnitude = this.toString().length - 1
+
+    return when (notation) {
+        Notation.NORMAL -> {
+            val index = (magnitude / 3).coerceAtMost(magnitudeKeys.size - 1) - 1
+
+            if (index >= magnitudeKeys.size) return this.formatted(Notation.SCIENTIFIC)
+
+            val value = this.toString()
+            val significantDigits = magnitude % 3 + 1 // Количество значащих цифр до точки
+            val formattedString = buildString {
+                append(value.substring(0, significantDigits)) // Берем первые значащие цифры
+                if (value.length > significantDigits) {
+                    append(".")
+                    append(value.substring(significantDigits, (significantDigits + 2).coerceAtMost(value.length)))
+                }
+            }.trimEnd('0').removeSuffix(".") // Убираем лишние нули и точку, если она осталась
+
+            translatable(magnitudeKeys[index], text(formattedString))
+        }
+
+        Notation.SCIENTIFIC -> {
+            val sciValue = this.toBigDecimal()
+                .movePointLeft(magnitude)
+                .setScale(2, java.math.RoundingMode.HALF_UP)
+                .stripTrailingZeros()
+            text("${sciValue.stripTrailingZeros()}e$magnitude")
         }
     }
+}
 
-    // Output the localization data to the console for debugging
-    Bukkit.getConsoleSender().sendMessage("Loaded localization: $localization")
+fun Player.setDefaultInventory() {
+    this.inventory.setItem(1, item(Material.GOLD_INGOT) {
+        this.itemName(translatable("item.name.shop"))
+    })
+    this.inventory.setItem(8, item(Material.NETHERITE_SCRAP) {
+        this.itemName(translatable("item.name.collection"))
+    })
 }
