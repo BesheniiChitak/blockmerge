@@ -15,17 +15,17 @@ import org.bukkit.inventory.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Утилита для упрощения регистрации и отмены регистрации Listener'ов.
+ * Utility for simplifying the registration and unregistration of Listeners.
  */
 fun Listener.unregister() = HandlerList.unregisterAll(this)
 fun Listener.register() = Bukkit.getPluginManager().registerEvents(this, plugin)
 
 /**
- * Класс InventoryMenu представляет меню инвентаря для игрока с настраиваемыми кнопками и действиями.
- * @param player Игрок, для которого открывается меню.
- * @param rows Количество строк в инвентаре.
- * @param title Заголовок инвентаря.
- * @param builder Лямбда-функция для настройки меню.
+ * The InventoryMenu class represents an inventory menu for a player with customizable buttons and actions.
+ * @param player The player for whom the menu is opened.
+ * @param rows The number of rows in the inventory.
+ * @param title The title of the inventory.
+ * @param builder A lambda function for configuring the menu.
  */
 class InventoryMenu(
     private val player: Player,
@@ -34,72 +34,72 @@ class InventoryMenu(
     private val builder: InventoryMenu.() -> Unit = {}
 ) : InventoryHolder, Listener {
 
-    private var closed = false // Флаг для отслеживания закрытия меню.
-    private val _inventory = Bukkit.createInventory(this, rows * 9, title) // Создание инвентаря.
-    private val objects = HashMap<Int, InventoryObject>() // Хранение объектов инвентаря по слотам.
-    private var closeHandler: InventoryCloseEvent.() -> Unit = {} // Обработчик закрытия инвентаря.
-    private var updateHandler: () -> Unit = {} // Обработчик обновления инвентаря.
+    private var closed = false // Flag for tracking menu closure.
+    private val _inventory = Bukkit.createInventory(this, rows * 9, title) // Inventory creation.
+    private val objects = HashMap<Int, InventoryObject>() // Storage of inventory objects by slot.
+    private var closeHandler: InventoryCloseEvent.() -> Unit = {} // Inventory close handler.
+    private var updateHandler: () -> Unit = {} // Inventory update handler.
 
     override fun getInventory(): Inventory = _inventory
 
     /**
-     * Установка обработчика закрытия инвентаря.
+     * Sets the inventory close handler.
      */
     fun onClose(action: InventoryCloseEvent.() -> Unit) {
         closeHandler = action
     }
 
     /**
-     * Запуск обновления меню с заданной периодичностью.
+     * Starts updating the menu at a specified interval.
      */
     fun updater(action: () -> Unit) {
         runTaskTimer(0.05.seconds) {
-            if (closed) it.cancel() // Останавливаем таймер, если меню закрыто.
-            else action() // Выполняем обновляющее действие.
+            if (closed) it.cancel() // Stop the timer if the menu is closed.
+            else action() // Perform the update action.
         }
     }
 
     /**
-     * Установка обработчика обновления инвентаря.
+     * Sets the inventory update handler.
      */
     fun update(action: () -> Unit) {
         updateHandler = action
     }
 
     /**
-     * Выполнение обновления меню с помощью заданного обработчика.
+     * Performs an update of the menu using the specified handler.
      */
     fun update() {
         updateHandler()
     }
 
     /**
-     * Добавление кнопки в указанный слот инвентаря.
+     * Adds a button to the specified inventory slot.
      */
     fun addButton(slot: Int, item: ItemStack, action: InventoryClickEvent.() -> Unit): InventoryMenu = apply {
-        objects[slot] = InventoryButton(action) // Сохраняем действие кнопки.
-        inventory.setItem(slot, item) // Устанавливаем предмет в инвентарь.
+        objects[slot] = InventoryButton(action) // Save the button's action.
+        inventory.setItem(slot, item) // Place the item in the inventory.
     }
 
     /**
-     * Установка предмета в указанный слот инвентаря с возможностью блокировки кликов.
+     * Sets an item in the specified inventory slot with the option to block clicks.
      */
     fun setItem(slot: Int, item: ItemStack, cancelClick: Boolean) {
-        objects[slot] = InventoryItem(cancelClick) // Сохраняем действие предмета.
-        inventory.setItem(slot, item) // Устанавливаем предмет в инвентарь.
+        objects[slot] = InventoryItem(cancelClick) // Save the item's behavior.
+        inventory.setItem(slot, item) // Place the item in the inventory.
     }
 
     /**
-     * Установка предметов в несколько слотов инвентаря с возможностью блокировки кликов.
+     * Sets items in multiple inventory slots with the option to block clicks.
      */
     fun setItems(slots: IntArray, item: ItemStack, cancelClick: Boolean) {
         slots.forEach { slot ->
-            setItem(slot, item, cancelClick) // Используем существующую логику для установки предметов.
+            setItem(slot, item, cancelClick) // Use existing logic to set items.
         }
     }
 
     /**
-     * Установка предметов в диапазон слотов инвентаря с возможностью блокировки кликов.
+     * Sets items in a range of inventory slots with the option to block clicks.
      */
     fun setItems(slots: IntRange, item: ItemStack, cancelClick: Boolean) {
         slots.forEach { slot ->
@@ -107,88 +107,84 @@ class InventoryMenu(
         }
     }
 
+    fun setItems(items: List<Pair<ItemStack, InventoryObject>>) {
+        items.forEachIndexed { i, (item, obj) ->
+            when (obj) {
+                is InventoryButton -> addButton(i, item, obj.clickHandler)
+                is InventoryItem -> setItem(i, item, obj.cancelClick)
+            }
+        }
+    }
+
     /**
-     * Открытие меню для игрока и регистрация событий.
+     * Opens the menu for the player and registers events.
      */
     fun open(): InventoryMenu {
-        builder(this) // Выполняем настройку меню.
-        register() // Регистрируем события.
-        player.openInventory(inventory) // Открываем инвентарь для игрока.
+        builder(this) // Perform menu configuration.
+        register() // Register events.
+        player.openInventory(inventory) // Open the inventory for the player.
         return this
     }
 
     /**
-     * Обработчик события клика по инвентарю.
+     * Handles inventory click events.
      */
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent) {
         val clickedInventory = event.clickedInventory ?: return
-        if (clickedInventory.holder != this) return // Проверяем, что кликнут инвентарь этого меню.
+        if (clickedInventory.holder != this) return // Ensure the clicked inventory belongs to this menu.
 
         val slot = event.slot
-        objects[slot]?.apply { // Обрабатываем действие в зависимости от типа объекта.
+        objects[slot]?.apply { // Process the action based on the type of object.
             when (this) {
                 is InventoryButton -> {
-                    event.isCancelled = true // Отменяем стандартное действие.
-                    clickHandler(event) // Выполняем действие кнопки.
+                    event.isCancelled = true // Cancel the default action.
+                    clickHandler(event) // Execute the button's action.
                 }
                 is InventoryItem -> {
-                    event.isCancelled = cancelClick // Блокируем клик, если это настроено.
+                    event.isCancelled = cancelClick // Block the click if configured.
                 }
             }
         }
     }
 
     /**
-     * Обработчик события закрытия инвентаря.
+     * Handles inventory close events.
      */
     @EventHandler
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (event.inventory.holder != this) return
-        if (event.reason != InventoryCloseEvent.Reason.PLUGIN) // Проверяем причину закрытия.
-            closeHandler(event) // Выполняем обработчик закрытия.
+        if (event.reason != InventoryCloseEvent.Reason.PLUGIN) // Check the reason for closure.
+            closeHandler(event) // Execute the close handler.
         closed = true
-        inventory.clear() // Очищаем инвентарь после закрытия.
-        objects.clear() // Очищаем все объекты инвентаря.
-        unregister() // Отменяем регистрацию событий.
+        inventory.clear() // Clear the inventory upon closure.
+        objects.clear() // Clear all inventory objects.
+        unregister() // Unregister events.
     }
 }
 
 /**
- * Класс для кнопки в инвентаре, выполняющей действие при клике.
+ * A class representing a button in the inventory that performs an action on click.
  */
 data class InventoryButton(
     val clickHandler: InventoryClickEvent.() -> Unit
 ) : InventoryObject
 
 /**
- * Класс для обычного предмета в инвентаре, который может блокировать клики.
+ * A class representing a regular inventory item that can block clicks.
  */
 data class InventoryItem(
     val cancelClick: Boolean
 ) : InventoryObject
 
 /**
- * Интерфейс, представляющий объект инвентаря.
+ * An interface representing an inventory object.
  */
 interface InventoryObject
 
 /**
- * Интерфейс для создания и открытия меню.
+ * An interface for creating and opening menus.
  */
 interface Menu {
     fun open(player: Player): InventoryMenu
-}
-
-/**
- * Функция для отправки подтверждающего меню игроку.
- * @param player Игрок, которому отправляется меню.
- * @param title Заголовок меню.
- * @param confirmationInfo Список текста для подтверждения.
- * @param onConfirmation Действие при подтверждении.
- */
-fun Menu.sendConfirmation(player: Player, title: String, confirmationInfo: List<Component>, onConfirmation: () -> Unit) {
-    InventoryMenu(player, 3, plain(title)) {
-        // Здесь можно добавить логику для подтверждающего меню.
-    }.open()
 }

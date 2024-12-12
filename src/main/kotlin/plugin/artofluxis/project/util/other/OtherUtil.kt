@@ -16,7 +16,13 @@ import net.kyori.adventure.text.Component.text
 import net.kyori.adventure.text.Component.translatable
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.persistence.PersistentDataAdapterContext
+import org.bukkit.persistence.PersistentDataType
+import plugin.artofluxis.project.util.guis.CollectionMenu.openCollection
+import plugin.artofluxis.project.util.guis.UpgradesMenu.openNormalUpgrades
 import plugin.artofluxis.project.util.item
+import plugin.artofluxis.project.util.key
 
 typealias BigInteger = @Serializable(with = BigIntegerSerializer::class) java.math.BigInteger
 
@@ -149,7 +155,7 @@ enum class Notation {
 
 fun BigInteger.formatted(notation: Notation): Component {
     if (this < BigInteger.valueOf(10_000)) {
-        text(this.toString())
+        return text(this.toString())
     }
     val magnitude = this.toString().length - 1
 
@@ -182,11 +188,48 @@ fun BigInteger.formatted(notation: Notation): Component {
     }
 }
 
+enum class ItemAction(
+    val call: (PlayerInteractEvent) -> Unit
+) {
+    MENU({ event ->
+        val player = event.player
+        openNormalUpgrades(player)
+    }),
+    COLLECTION({ event ->
+        val player = event.player
+        openCollection(player, 1)
+    })
+}
+
+@Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN")
+class ItemActionType : PersistentDataType<Integer, ItemAction> {
+    override fun getPrimitiveType(): Class<Integer> {
+        return Integer::class.java
+    }
+
+    override fun getComplexType(): Class<ItemAction> {
+        return ItemAction::class.java
+    }
+
+    override fun toPrimitive(complex: ItemAction, context: PersistentDataAdapterContext): Integer {
+        return complex.ordinal as Integer
+    }
+
+    override fun fromPrimitive(primitive: Integer, context: PersistentDataAdapterContext): ItemAction {
+        return ItemAction.entries[primitive.toInt()]
+    }
+}
+
+
 fun Player.setDefaultInventory() {
     this.inventory.setItem(1, item(Material.GOLD_INGOT) {
-        this.itemName(translatable("item.name.shop"))
+        this.itemName(text("ᴍᴇɴᴜ").color(MColor.GOLD))
+        this.isHideTooltip = true
+        this.persistentDataContainer.set(key("action"), ItemActionType(), ItemAction.MENU)
     })
-    this.inventory.setItem(8, item(Material.NETHERITE_SCRAP) {
-        this.itemName(translatable("item.name.collection"))
+    this.inventory.setItem(7, item(Material.NETHERITE_SCRAP) {
+        this.itemName(text("ʙʟᴏᴄᴋ ᴄᴏʟʟᴇᴄᴛɪᴏɴ").color(MColor.GRAY))
+        this.isHideTooltip = true
+        this.persistentDataContainer.set(key("action"), ItemActionType(), ItemAction.COLLECTION)
     })
 }

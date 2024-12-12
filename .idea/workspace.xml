@@ -4,31 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6824ddfc-90a7-4028-862c-3f3743cea8c1" name="Changes" comment="base">
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/commands/ExampleCommand.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/commands/NotationCommand.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/MergeUtil.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/PlotUtil.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/locale/Bundle_en_US.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/locale/Bundle_ru_RU.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/settings.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/settings.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/GlobalListener.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/GlobalListener.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/Plugin.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/Plugin.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/StatsLoad.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/StatsLoad.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/ItemUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/ItemUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/OtherUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/OtherUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/SchedulerUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/SchedulerUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/TextUtil.kt" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/kotlin/plugin/artofluxis/project/util/other/TextUtil.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/plugin.yml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/plugin.yml" afterDir="false" />
-    </list>
+    <list default="true" id="6824ddfc-90a7-4028-862c-3f3743cea8c1" name="Changes" comment="base" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -43,6 +19,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Kotlin Class" />
+        <option value="Kotlin File" />
       </list>
     </option>
   </component>
@@ -75,10 +52,12 @@
     &quot;Gradle.Build blockmerge.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.Download Sources.executor&quot;: &quot;Run&quot;,
     &quot;Gradle.blockmerge [build].executor&quot;: &quot;Run&quot;,
+    &quot;Kotlin.GameUtilKt.executor&quot;: &quot;Run&quot;,
     &quot;Kotlin.OtherUtilKt.executor&quot;: &quot;Run&quot;,
     &quot;Kotlin.PlotUtilKt.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;File.Encoding&quot;
@@ -89,10 +68,11 @@
       <recent name="E:\IDE\projects\blockmerge\src\main\resources" />
     </key>
     <key name="CopyKotlinDeclarationDialog.RECENTS_KEY">
+      <recent name="plugin.artofluxis.project.util.guis" />
       <recent name="plugin.artofluxis.project.util.commands" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.blockmerge [build]">
+  <component name="RunManager">
     <configuration name="blockmerge [build]" type="GradleRunConfiguration" factoryName="Gradle" nameIsGenerated="true">
       <ExternalSystemSettings>
         <option name="executionName" />
@@ -115,31 +95,6 @@
       <RunAsTest>false</RunAsTest>
       <method v="2" />
     </configuration>
-    <configuration name="OtherUtilKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="plugin.artofluxis.project.util.other.OtherUtilKt" />
-      <module name="blockmerge.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="PlotUtilKt" type="JetRunConfigurationType" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="plugin.artofluxis.project.util.other.PlotUtilKt" />
-      <module name="blockmerge.main" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <list>
-      <item itemvalue="Gradle.blockmerge [build]" />
-      <item itemvalue="Kotlin.OtherUtilKt" />
-      <item itemvalue="Kotlin.PlotUtilKt" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Kotlin.OtherUtilKt" />
-        <item itemvalue="Kotlin.PlotUtilKt" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -158,7 +113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733912811150</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="base">
+      <option name="closed" value="true" />
+      <created>1733912853314</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1733912853314</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">

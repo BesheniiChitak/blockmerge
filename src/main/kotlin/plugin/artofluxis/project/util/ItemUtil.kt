@@ -8,7 +8,6 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.SkullMeta
 import plugin.artofluxis.project.plugin
 import java.net.URI
-import java.net.URL
 import java.util.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract

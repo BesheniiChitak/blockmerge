@@ -31,6 +31,10 @@ class PlotWorldLocation(
     override fun equals(other: Any?): Boolean {
         return if (other is PlotWorldLocation) x == other.x && z == other.z else false
     }
+
+    override fun hashCode(): Int {
+        return javaClass.hashCode()
+    }
 }
 
 fun List<PlotWorldLocation>.containsLocation(loc: PlotWorldLocation): Boolean {
@@ -42,18 +46,24 @@ fun Location.toPlotWorldLocation(): PlotWorldLocation {
 }
 
 @Serializable
-data class PlotStats(
+data class PlotUpgrades(
     var blockLevel: Int = 0,
+)
+
+@Serializable
+data class PlotStats(
+    var upgrades: PlotUpgrades = PlotUpgrades(),
+    var bestUnlockedBlock: Int = 0,
     var notation: Notation = Notation.NORMAL,
     var money: BigInteger = BigInteger("0"),
 )
 
 @Serializable
 class Plot(
-    val position: Int,
+    private val position: Int,
 ) {
     var owner: String? = null
-    var location: PlotWorldLocation? = null
+    private var location: PlotWorldLocation? = null
     var currentSelectedBlock: PlotWorldLocation? = null
     val placeableLocations = mutableListOf<PlotWorldLocation>()
 
@@ -119,7 +129,7 @@ class Plot(
                 if (loc == currentSelectedBlock) continue
                 val pos = loc.position().add(0.0, 1.0, 0.0)
                 if (pos.block.type == Material.AIR) {
-                    pos.block.type = blocks[stats.blockLevel]
+                    pos.block.type = blocks[stats.upgrades.blockLevel]
                     break
                 }
             }

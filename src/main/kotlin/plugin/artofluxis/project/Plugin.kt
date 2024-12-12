@@ -13,7 +13,6 @@ import plugin.artofluxis.project.util.other.*
 import java.util.*
 import kotlin.time.Duration.Companion.seconds
 
-
 lateinit var plugin: Plugin
 lateinit var plotWorld: World
 

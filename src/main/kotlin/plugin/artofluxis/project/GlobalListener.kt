@@ -21,11 +21,12 @@ import plugin.artofluxis.project.util.other.*
 
 object GlobalListener : Listener {
 
-    val playerInteractionCooldown = hashMapOf<String, Boolean>()
+    private val playerInteractionCooldown = hashMapOf<String, Boolean>()
 
     @EventHandler
     fun onServerListPing(event: ServerListPingEvent) {
-
+        event.maxPlayers = event.numPlayers + 1
+        event.motd(text("AAAAAAAAAAAA"))
     }
 
     @EventHandler
@@ -53,11 +54,12 @@ object GlobalListener : Listener {
         runTaskLater(3) {
             player.worldBorder = plot.worldBorder
             player.sendMessage(translatable("sys.plot_loaded").color(MColor.LIME))
+            player.setDefaultInventory()
         }
     }
 
     @EventHandler
-    fun onPlayerInteract(event: PlayerInteractEvent) {
+    fun onBlockCollect(event: PlayerInteractEvent) {
         val player = event.player
         if (playerInteractionCooldown[player.name] == true || event.clickedBlock?.location?.y?.toInt() != 17 || event.hand != EquipmentSlot.HAND || event.action != Action.LEFT_CLICK_BLOCK || !player.hasPlot()) return
 
@@ -81,12 +83,8 @@ object GlobalListener : Listener {
             player.inventory.heldItemSlot = 4
             player.inventory.setItem(4, item(block.type) {
                 this.itemName(translatable(block.type.translationKey()).color(MColor.GOLD))
-                this.lore(
-                    listOf(
-                        text(blocksToEarnings[block.type].toString())
-                    )
-                )
                 this.persistentDataContainer.set(key("earnblock"), PersistentDataType.BOOLEAN, true)
+                this.isHideTooltip = true
             })
             block.type = Material.AIR
         } else {
@@ -116,5 +114,13 @@ object GlobalListener : Listener {
             return
         }
         plot.currentSelectedBlock = null
+    }
+
+    @EventHandler
+    fun onItemClick(event: PlayerInteractEvent) {
+        val player = event.player
+        if (event.hand != EquipmentSlot.HAND || !event.action.isRightClick || !player.hasPlot()) return
+        val item = player.inventory.itemInMainHand
+        (item.persistentDataContainer[key("action"), ItemActionType()] ?: return).call(event)
     }
 }
